@@ -9,9 +9,12 @@ interface IProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const VARIANTS = {
-  primary: "bg-accent text-white",
-  outline: "border border-black/10 text-primary",
-  "outline-accent": "border border-accent/40 text-accent",
+  primary:
+    "bg-accent text-white hover:bg-accent/90 active:bg-accent/80 active:scale-[0.98]",
+  outline:
+    "border border-black/10 text-primary hover:border-black/25 hover:bg-primary/5 active:bg-primary/10 active:scale-[0.98]",
+  "outline-accent":
+    "border border-accent/40 text-accent hover:border-accent/60 hover:bg-accent/5 active:bg-accent/10 active:scale-[0.98]",
 } as const;
 
 const SIZES = {
@@ -32,7 +35,7 @@ export function Button({
     <button
       type="button"
       disabled={disabled || isLoading}
-      className={`rounded-lg disabled:cursor-not-allowed disabled:opacity-50 ${VARIANTS[variant]} ${SIZES[size]} ${className}`}
+      className={`rounded-lg transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40 disabled:pointer-events-none disabled:opacity-50 ${VARIANTS[variant]} ${SIZES[size]} ${className}`}
       {...rest}
     >
       <span className="flex items-center justify-center gap-2">

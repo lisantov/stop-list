@@ -16,8 +16,8 @@ export function Input({ label, id, error, hint, className = "", ...rest }: IProp
       <input
         id={id}
         aria-invalid={error ? true : undefined}
-        className={`rounded-lg border bg-white px-3 py-2 text-primary focus:outline-none focus:ring-2 focus:ring-accent/40 ${className} ${
-          error ? "border-accent" : "border-black/10"
+        className={`transition-all duration-150 rounded-lg border bg-white px-3 py-2 text-primary placeholder:text-primary/40 focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent ${className} ${
+          error ? "border-accent hover:border-accent" : "border-black/10 hover:border-black/25"
         }`}
         {...rest}
       />
