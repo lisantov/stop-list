@@ -87,3 +87,15 @@ export function useResumeItem() {
     },
   });
 }
+
+export function useUpdateItem() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, body }: { id: string; body: StopItemPayload }) =>
+      stopListService.update(id, body),
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: stopListKeys.all() });
+    },
+  });
+}

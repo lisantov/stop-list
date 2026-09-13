@@ -34,6 +34,12 @@ export function formatDateTime(iso: string): string {
   return dateFormatter.format(new Date(iso));
 }
 
+export function isoToLocalInput(iso: string): string {
+  const date = new Date(iso);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}
+
 export function pluralPositions(count: number): string {
   const mod10 = count % 10;
   const mod100 = count % 100;

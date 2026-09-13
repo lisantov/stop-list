@@ -1,13 +1,24 @@
 "use client";
 
+import { useStopModalStore } from "../model/stopModalStore";
 import { useStopListItems } from "../model/query";
 import type { IGetItemsParams } from "../model/types";
+import StopFormModal from "./StopFormModal";
 import StopListTable from "./StopListTable";
 
 export default function StopListContainer({ shop, status }: IGetItemsParams) {
-  const { data, isLoading } = useStopListItems({ shop, status });
+  const { data: items } = useStopListItems({ shop, status });
+  const { itemId, close } = useStopModalStore();
 
-  if (isLoading) return "Loading...";
+  const list = items ?? [];
+  const modalItem = itemId ? list.find((item) => item.id === itemId) : undefined;
 
-  return <StopListTable items={data ?? []} />;
+  return (
+    <>
+      <StopListTable items={list} />
+      {modalItem && (
+        <StopFormModal key={itemId} item={modalItem} onClose={close} />
+      )}
+    </>
+  );
 }

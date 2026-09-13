@@ -1,4 +1,4 @@
-import { stop } from "@/server/menu-store";
+import { update } from "@/server/menu-store";
 import type { StopItemPayload } from "@/types/menu";
 import { normalizeUntil, stopItemSchema } from "@/shared";
 
@@ -6,7 +6,7 @@ type Props = {
   params: Promise<{ id: string }>;
 };
 
-export async function POST(request: Request, { params }: Props) {
+export async function PATCH(request: Request, { params }: Props) {
   const { id } = await params;
 
   let body: unknown;
@@ -26,10 +26,11 @@ export async function POST(request: Request, { params }: Props) {
     until: normalizeUntil(parsed.data.until),
   };
 
-  const item = stop(id, payload);
-  if (!item) {
-    return Response.json({ error: `Menu item not found: ${id}` }, { status: 404 });
+  const result = update(id, payload);
+  if (!result.ok) {
+    const status = result.reason === "not_found" ? 404 : 409;
+    return Response.json({ error: result.reason }, { status });
   }
 
-  return Response.json(item);
+  return Response.json(result.item);
 }
