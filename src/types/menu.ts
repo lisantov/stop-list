@@ -6,10 +6,12 @@ export type StopReason =
   | "quality" // вопросы к качеству партии
   | "menu_change"; // позиция выведена из меню смены
 
+export type MenuItemStatusKind = "available" | "stopped";
+
 export type MenuItemStatus =
-  | { kind: "available" }
+  | { kind: MenuItemStatusKind }
   | {
-      kind: "stopped";
+      kind: MenuItemStatusKind;
       reason: StopReason;
       until: string | null; // ISO-время или null = до конца смены
     };
