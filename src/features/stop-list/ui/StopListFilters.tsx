@@ -24,7 +24,7 @@ export default function StopListFilters({ shop, status }: IProps) {
     if (key === "status" && value !== "all") params.set("status", value);
 
     const query = params.toString();
-    router.replace(query ? `${pathname}?${query}` : pathname);
+    router.push(query ? `${pathname}?${query}` : pathname);
   };
 
   return (

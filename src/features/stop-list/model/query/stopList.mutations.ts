@@ -6,20 +6,30 @@ import { stopListService } from "../api";
 import { stopListKeys } from "./stopList.keys";
 import { useSavingStore } from "../savingStore";
 
-interface ListSnapshot {
+interface ItemSnapshot {
   queryKey: QueryKey;
-  data: MenuItem[] | undefined;
+  target: MenuItem | undefined;
 }
 
-function snapshotLists(queryClient: QueryClient): ListSnapshot[] {
+function snapshotItem(queryClient: QueryClient, id: string): ItemSnapshot[] {
   return queryClient
     .getQueriesData<MenuItem[]>({ queryKey: stopListKeys.all() })
-    .map(([queryKey, data]) => ({ queryKey, data }));
+    .map(([queryKey, items]) => ({
+      queryKey,
+      target: items?.find((item) => item.id === id),
+    }));
 }
 
-function restoreLists(queryClient: QueryClient, snapshot: ListSnapshot[]) {
-  snapshot.forEach(({ queryKey, data }) => {
-    queryClient.setQueryData(queryKey, data);
+function restoreItem(
+  queryClient: QueryClient,
+  id: string,
+  snapshot: ItemSnapshot[],
+) {
+  snapshot.forEach(({ queryKey, target }) => {
+    if (!target) return;
+    queryClient.setQueryData<MenuItem[]>(queryKey, (current) =>
+      current?.map((item) => (item.id === id ? target : item)),
+    );
   });
 }
 
@@ -45,7 +55,7 @@ export function useStopItem() {
 
     onMutate: async ({ id, body }) => {
       await queryClient.cancelQueries({ queryKey: stopListKeys.all() });
-      const previous = snapshotLists(queryClient);
+      const previous = snapshotItem(queryClient, id);
 
       queryClient.setQueriesData<MenuItem[]>(
         { queryKey: stopListKeys.all() },
@@ -60,8 +70,8 @@ export function useStopItem() {
       return { previous };
     },
 
-    onError: (error, _variables, context) => {
-      if (context?.previous) restoreLists(queryClient, context.previous);
+    onError: (error, { id }, context) => {
+      if (context?.previous) restoreItem(queryClient, id, context.previous);
       reportError(error, "Не удалось остановить позицию");
     },
 
@@ -80,7 +90,7 @@ export function useResumeItem() {
 
     onMutate: async (id) => {
       await queryClient.cancelQueries({ queryKey: stopListKeys.all() });
-      const previous = snapshotLists(queryClient);
+      const previous = snapshotItem(queryClient, id);
 
       queryClient.setQueriesData<MenuItem[]>(
         { queryKey: stopListKeys.all() },
@@ -95,48 +105,12 @@ export function useResumeItem() {
       return { previous };
     },
 
-    onError: (error, _variables, context) => {
-      if (context?.previous) restoreLists(queryClient, context.previous);
+    onError: (error, id, context) => {
+      if (context?.previous) restoreItem(queryClient, id, context.previous);
       reportError(error, "Не удалось вернуть позицию в продажу");
     },
 
     onSettled: (_data, error, id) => {
-      useSavingStore.getState().stop(id);
-      if (!error) queryClient.invalidateQueries({ queryKey: stopListKeys.all() });
-    },
-  });
-}
-
-export function useUpdateItem() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: ({ id, body }: { id: string; body: StopItemPayload }) =>
-      stopListService.update(id, body),
-
-    onMutate: async ({ id, body }) => {
-      await queryClient.cancelQueries({ queryKey: stopListKeys.all() });
-      const previous = snapshotLists(queryClient);
-
-      queryClient.setQueriesData<MenuItem[]>(
-        { queryKey: stopListKeys.all() },
-        (items) =>
-          replaceItem(items, id, (item) => ({
-            ...item,
-            status: { kind: "stopped", reason: body.reason, until: body.until },
-            updatedAt: new Date().toISOString(),
-          })),
-      );
-      useSavingStore.getState().start(id);
-      return { previous };
-    },
-
-    onError: (error, _variables, context) => {
-      if (context?.previous) restoreLists(queryClient, context.previous);
-      reportError(error, "Не удалось сохранить изменения");
-    },
-
-    onSettled: (_data, error, { id }) => {
       useSavingStore.getState().stop(id);
       if (!error) queryClient.invalidateQueries({ queryKey: stopListKeys.all() });
     },

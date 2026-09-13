@@ -1,36 +1,112 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Stop List
 
-## Getting Started
+Управление стоп-листом меню ресторана. Приложение показывает позиции меню, позволяет ставить их в стоп-лист и снимать с причина и сроком, а также редактировать уже остановленные позиции.
 
-First, run the development server:
+---
+
+## Установка и запуск
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev      # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Доступные команды:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Команда            | Описание                        |
+| ------------------ | ------------------------------- |
+| `npm run dev`      | Development-сервер с HMR        |
+| `npm run build`    | Production-сборка               |
+| `npm run start`    | Запуск production-сборки        |
+| `npm run lint`     | Проверка ESLint                 |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## API
 
-To learn more about Next.js, take a look at the following resources:
+| Метод   | Путь                       | Описание                                                | Код ошибки |
+| ------- | -------------------------- | ------------------------------------------------------- | ---------- |
+| `GET`   | `/api/menu-items`          | Список позиций; фильтры `?shop=` и `?status=`         | 400        |
+| `POST`  | `/api/menu-items/:id/stop` | Постановка / редактирование стопа (upsert)             | 400, 404, 500 |
+| `POST`  | `/api/menu-items/:id/resume` | Снятие со стопа                                       | 400, 404, 409, 500 |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Контракт ошибок: `{ error: string }`.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## Валидация
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+| Поле          | Правило                                                                                   |
+| ------------- | ----------------------------------------------------------------------------------------- |
+| Причина стопа | Обязательно; одно из четырёх значений: `out_of_stock`, `equipment`, `quality`, `menu_change` |
+| Срок стопа    | Пусто = до конца смены (`null`); либо время строго в будущем, не позже чем через 24 ч, шаг 15 минут |
+| Остаток       | При `stock = 0` снятие со стопа запрещено (кнопка заблокирована с подсказкой)                |
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Валидация проверяется на клиенте (при потере фокуса и при отправке формы) и на сервере перед изменением данных.
+
+---
+
+## Оптимистичное обновление и симуляция ошибок
+
+### Поведение при ошибках
+
+- **~20 % запросов к мутациям (POST)** случайным образом возвращают ошибку 500 — это задумано для демонстрации оптимистичного отката.
+- При ошибке сервера: оптимистически изменённая строка **откатывается без перерендера всего списка** (точечный откат по `id`), а в правом верхнем углу появляется **тост** с текстом ошибки.
+- Множественные мутации по одной позиции (двойной клик) **дедуплицируются** — второе нажатие блокируется до завершения первого запроса.
+
+### GET
+
+- `GET /api/menu-items` получает **задержку 600 мс** для отображения skeleton-загрузки на клиенте.
+- На время загрузки UI показывает скелетон, при ошибке — сообщение с кнопкой «Повторить».
+- Фильтры добавлены в URL через `router.push` — кнопка «Назад» возвращает предыдущие параметры фильтрации.
+
+### Таймзоны
+
+Клиент конвертирует `datetime-local` в UTC-ISO в браузере (локальный часовой пояс пользователя); сервер передаёт ISO без повторной интерпретации. Это гарантирует корректное время даже если клиент и сервер находятся в разных часовых поясах.
+
+---
+
+## Структура проекта
+
+```
+src/
+├── app/
+│   ├── api/
+│   │   └── menu-items/
+│   │       ├── route.ts          # GET — список с фильтрами
+│   │       └── [id]/
+│   │           ├── resume/route.ts   # POST — снять со стопа
+│   │           └── stop/route.ts     # POST — постановка / редактирование
+│   ├── assets/globals.css
+│   ├── layout.tsx
+│   ├── page.tsx
+│   └── providers.tsx
+├── features/
+│   └── stop-list/
+│       └── ui/
+│           ├── StopListContainer.tsx  # Клиент-обёртка (данные + модалка)
+│           ├── StopListTable.tsx      # Список позиций
+│           ├── StopListItem.tsx       # Строка позиции (кнопки, бейджи)
+│           ├── StopFormModal.tsx      # Модалка причины/срока
+│           ├── StopListFilters.tsx    # Фильтры цеха и статуса (URL)
+│           ├── StopListSkeleton.tsx   # Skeleton-загрузка
+│           ├── StopListError.tsx      # Сообщение об ошибке с retry
+│           └── stopList.config.ts     # Лейблы, бейджи, хелперы
+├── server/
+│   ├── menu-store.ts     # In-memory store (seed)
+│   ├── network-sim.ts    # Симуляция задержки и случайных отказов
+│   └── seed.json         # Начальные данные (15 позиций)
+├── shared/
+│   ├── api/instance.ts   # fetcher + ApiError
+│   ├── schemas/stopItem.ts  # Zod-схема валидации
+│   ├── ui/               # Переиспользуемые компоненты
+│   │   ├── Button.tsx    # isLoading, variant, size
+│   │   ├── Input.tsx     # label + error + hint
+│   │   ├── Modal.tsx
+│   │   ├── Select.tsx
+│   │   ├── Spinner.tsx
+│   │   └── Toast.tsx     # Zustand-хранилище + Toaster
+│   └── utils.ts          # validateUntil, delay
+└── types/
+    └── menu/types.ts + guards.ts
+```

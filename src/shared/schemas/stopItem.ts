@@ -9,6 +9,7 @@ export const stopReasons = [
 ] as const;
 
 const IS_DATETIME_LOCAL = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/;
+const IS_ISO = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/;
 
 export function toISO(value: string): string {
   return new Date(value).toISOString();
@@ -16,7 +17,9 @@ export function toISO(value: string): string {
 
 export function normalizeUntil(value: string | null | undefined): string | null {
   if (value == null || value === "") return null;
-  return IS_DATETIME_LOCAL.test(value) ? toISO(value) : value;
+  if (IS_ISO.test(value)) return value;
+  if (IS_DATETIME_LOCAL.test(value)) return toISO(value);
+  return value;
 }
 
 export const stopItemSchema = z.object({
@@ -27,7 +30,9 @@ export const stopItemSchema = z.object({
     .refine(
       (value) => {
         if (value === "") return true;
-        return validateUntil(normalizeUntil(value)) === null;
+        const iso = normalizeUntil(value);
+        if (iso === null) return false;
+        return validateUntil(iso) === null;
       },
       { message: "Некорректное время окончания" },
     )

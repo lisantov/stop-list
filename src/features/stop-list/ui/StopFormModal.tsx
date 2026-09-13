@@ -5,8 +5,8 @@ import { useForm } from "react-hook-form";
 import type { Resolver } from "react-hook-form";
 import { Button, Input, Modal, Select } from "@/shared";
 import type { MenuItem, StopItemPayload, StopReason } from "@/types/menu";
-import { normalizeUntil, stopItemSchema, stopReasons } from "@/shared";
-import { useStopItem, useUpdateItem } from "../model/query";
+import { stopItemSchema, stopReasons, toISO } from "@/shared";
+import { useStopItem } from "../model/query";
 import { STOP_REASON_LABELS, isoToLocalInput } from "./stopList.config";
 
 interface IProps {
@@ -37,19 +37,20 @@ export default function StopFormModal({ item, onClose }: IProps) {
   });
 
   const stopItem = useStopItem();
-  const updateItem = useUpdateItem();
-  const isPending = stopItem.isPending || updateItem.isPending;
-  const errorMessage = stopItem.error?.message ?? updateItem.error?.message;
+  const errorMessage = stopItem.error?.message;
 
   const submit = (values: FormValues) => {
     if (!values.reason) return;
     const body: StopItemPayload = {
       reason: values.reason,
-      until: normalizeUntil(values.until),
+      until: values.until === "" ? null : toISO(values.until),
     };
-    const options = { onSuccess: () => onClose() };
-    if (isEdit) updateItem.mutate({ id: item.id, body }, options);
-    else stopItem.mutate({ id: item.id, body }, options);
+    stopItem.mutate(
+      { id: item.id, body },
+      {
+        onSuccess: () => onClose(),
+      },
+    );
   };
 
   return (
@@ -76,8 +77,10 @@ export default function StopFormModal({ item, onClose }: IProps) {
 
         <Input
           id="until"
-          label="До (пусто — до конца смены)"
+          label="До"
+          hint="Пусто — до конца смены"
           type="datetime-local"
+          step={900}
           error={form.formState.errors.until?.message}
           {...form.register("until")}
         />
@@ -88,7 +91,7 @@ export default function StopFormModal({ item, onClose }: IProps) {
           <Button variant="outline" onClick={onClose}>
             Отмена
           </Button>
-          <Button type="submit" isLoading={isPending}>
+          <Button type="submit" isLoading={stopItem.isPending}>
             {isEdit ? "Сохранить" : "Остановить"}
           </Button>
         </div>

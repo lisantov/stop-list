@@ -14,9 +14,4 @@ export const stopListService = {
     fetcher<MenuItem>(`/api/menu-items/${id}/resume`, {
       method: "POST",
     }),
-  update: (id: string, body: StopItemPayload) =>
-    fetcher<MenuItem>(`/api/menu-items/${id}`, {
-      method: "PATCH",
-      body: JSON.stringify(body),
-    }),
 };

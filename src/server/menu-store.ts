@@ -36,26 +36,11 @@ export function resume(id: string): MenuItem | undefined {
 
 export type StopResult =
   | { ok: true; item: MenuItem }
-  | { ok: false; reason: "not_found" | "already_stopped" };
+  | { ok: false; reason: "not_found" };
 
 export function stop(id: string, payload: StopItemPayload): StopResult {
   const item = getItem(id);
   if (!item) return { ok: false, reason: "not_found" };
-  if (item.status.kind !== "available")
-    return { ok: false, reason: "already_stopped" };
-  item.status = { kind: "stopped", ...payload };
-  item.updatedAt = new Date().toISOString();
-  return { ok: true, item };
-}
-
-export type UpdateResult =
-  | { ok: true; item: MenuItem }
-  | { ok: false; reason: "not_found" | "not_stopped" };
-
-export function update(id: string, payload: StopItemPayload): UpdateResult {
-  const item = getItem(id);
-  if (!item) return { ok: false, reason: "not_found" };
-  if (item.status.kind !== "stopped") return { ok: false, reason: "not_stopped" };
   item.status = { kind: "stopped", ...payload };
   item.updatedAt = new Date().toISOString();
   return { ok: true, item };

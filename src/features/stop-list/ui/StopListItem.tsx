@@ -92,8 +92,10 @@ export default function StopListItem({ item }: IProps) {
                 <Button
                   size="sm"
                   isLoading={resume.isPending}
-                  disabled={!canResume}
-                  onClick={() => resume.mutate(item.id)}
+                  disabled={!canResume || resume.isPending}
+                  onClick={() => {
+                    if (!resume.isPending) resume.mutate(item.id);
+                  }}
                 >
                   Вернуть в продажу
                 </Button>

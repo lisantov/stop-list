@@ -4,9 +4,10 @@ interface IProps extends InputHTMLAttributes<HTMLInputElement> {
   label: string;
   id: string;
   error?: string;
+  hint?: string;
 }
 
-export function Input({ label, id, error, className = "", ...rest }: IProps) {
+export function Input({ label, id, error, hint, className = "", ...rest }: IProps) {
   return (
     <div className="flex flex-col gap-1.5">
       <label htmlFor={id} className="text-sm text-primary/80">
@@ -20,7 +21,11 @@ export function Input({ label, id, error, className = "", ...rest }: IProps) {
         }`}
         {...rest}
       />
-      {error && <p className="text-sm text-accent">{error}</p>}
+      {error ? (
+        <p className="text-sm text-accent">{error}</p>
+      ) : hint ? (
+        <p className="text-sm text-primary/50">{hint}</p>
+      ) : null}
     </div>
   );
 }
