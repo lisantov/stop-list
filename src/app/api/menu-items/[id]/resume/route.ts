@@ -1,4 +1,4 @@
-import { resume } from "@/server/menu-store";
+import { getItem, resume } from "@/server/menu-store";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -7,12 +7,19 @@ type Props = {
 export async function POST(_request: Request, { params }: Props) {
   const { id } = await params;
 
-  const item = resume(id);
+  const item = getItem(id);
   if (!item)
     return Response.json(
-      { error: `Позиция в меню не найдена: ${id}` },
+      { error: "Позиция в меню не найдена" },
       { status: 404 },
     );
 
-  return Response.json(item);
+  if (item.stock === 0)
+    return Response.json(
+      { error: "Нельзя вернуть позицию с нулевым остатком" },
+      { status: 409 },
+    );
+
+  const updated = resume(id);
+  return Response.json(updated);
 }

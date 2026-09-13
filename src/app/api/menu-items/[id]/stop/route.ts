@@ -26,10 +26,15 @@ export async function POST(request: Request, { params }: Props) {
     until: normalizeUntil(parsed.data.until),
   };
 
-  const item = stop(id, payload);
-  if (!item) {
-    return Response.json({ error: `Menu item not found: ${id}` }, { status: 404 });
+  const result = stop(id, payload);
+  if (!result.ok) {
+    const message =
+      result.reason === "not_found"
+        ? "Позиция в меню не найдена"
+        : "Позиция уже в стоп-листе";
+    const status = result.reason === "not_found" ? 404 : 409;
+    return Response.json({ error: message }, { status });
   }
 
-  return Response.json(item);
+  return Response.json(result.item);
 }

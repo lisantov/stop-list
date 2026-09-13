@@ -52,5 +52,113 @@
       "until": "2026-09-13T16:00:00Z"
     },
     "updatedAt": "2026-09-13T10:00:00Z"
+  },
+  {
+    "id": "6",
+    "title": "Том Ям",
+    "shop": "kitchen",
+    "stock": 12,
+    "status": {
+      "kind": "available"
+    },
+    "updatedAt": "2026-09-13T09:00:00Z"
+  },
+  {
+    "id": "7",
+    "title": "Бургер с говядиной",
+    "shop": "bar",
+    "stock": 9,
+    "status": {
+      "kind": "available"
+    },
+    "updatedAt": "2026-09-13T11:30:00Z"
+  },
+  {
+    "id": "8",
+    "title": "Картофель фри",
+    "shop": "bar",
+    "stock": 20,
+    "status": {
+      "kind": "available"
+    },
+    "updatedAt": "2026-09-13T13:00:00Z"
+  },
+  {
+    "id": "9",
+    "title": "Чизкейк Нью-Йорк",
+    "shop": "pastry",
+    "stock": 5,
+    "status": {
+      "kind": "stopped",
+      "reason": "quality",
+      "until": null
+    },
+    "updatedAt": "2026-09-13T09:30:00Z"
+  },
+  {
+    "id": "10",
+    "title": "Салат Цезарь",
+    "shop": "kitchen",
+    "stock": 3,
+    "status": {
+      "kind": "stopped",
+      "reason": "out_of_stock",
+      "until": "2026-09-13T18:00:00Z"
+    },
+    "updatedAt": "2026-09-13T10:30:00Z"
+  },
+  {
+    "id": "11",
+    "title": "Клубный сэндвич",
+    "shop": "bar",
+    "stock": 7,
+    "status": {
+      "kind": "available"
+    },
+    "updatedAt": "2026-09-13T12:30:00Z"
+  },
+  {
+    "id": "12",
+    "title": "Мартини «Эспрессо»",
+    "shop": "bar",
+    "stock": 14,
+    "status": {
+      "kind": "available"
+    },
+    "updatedAt": "2026-09-13T14:00:00Z"
+  },
+  {
+    "id": "13",
+    "title": "Эклер ванильный",
+    "shop": "pastry",
+    "stock": 11,
+    "status": {
+      "kind": "available"
+    },
+    "updatedAt": "2026-09-13T13:30:00Z"
+  },
+  {
+    "id": "14",
+    "title": "Глазированный пончик",
+    "shop": "pastry",
+    "stock": 0,
+    "status": {
+      "kind": "stopped",
+      "reason": "out_of_stock",
+      "until": "2026-09-13T17:00:00Z"
+    },
+    "updatedAt": "2026-09-13T11:00:00Z"
+  },
+  {
+    "id": "15",
+    "title": "Морковный торт",
+    "shop": "pastry",
+    "stock": 6,
+    "status": {
+      "kind": "stopped",
+      "reason": "out_of_stock",
+      "until": "2026-09-13T21:00:00Z"
+    },
+    "updatedAt": "2026-09-13T11:30:00Z"
   }
 ]

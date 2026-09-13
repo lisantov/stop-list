@@ -4,6 +4,7 @@ import { useStopModalStore } from "../model/stopModalStore";
 import { useStopListItems } from "../model/query";
 import type { IGetItemsParams } from "../model/types";
 import StopFormModal from "./StopFormModal";
+import StopListFilters from "./StopListFilters";
 import StopListTable from "./StopListTable";
 
 export default function StopListContainer({ shop, status }: IGetItemsParams) {
@@ -15,6 +16,7 @@ export default function StopListContainer({ shop, status }: IGetItemsParams) {
 
   return (
     <>
+      <StopListFilters shop={shop} status={status} />
       <StopListTable items={list} />
       {modalItem && (
         <StopFormModal key={itemId} item={modalItem} onClose={close} />

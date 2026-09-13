@@ -34,14 +34,18 @@ export function resume(id: string): MenuItem | undefined {
   return item;
 }
 
-export function stop(id: string, payload: StopItemPayload): MenuItem | undefined {
+export type StopResult =
+  | { ok: true; item: MenuItem }
+  | { ok: false; reason: "not_found" | "already_stopped" };
+
+export function stop(id: string, payload: StopItemPayload): StopResult {
   const item = getItem(id);
-  if (!item) return undefined;
-  if (item.status.kind === "available") {
-    item.status = { kind: "stopped", ...payload };
-    item.updatedAt = new Date().toISOString();
-  }
-  return item;
+  if (!item) return { ok: false, reason: "not_found" };
+  if (item.status.kind !== "available")
+    return { ok: false, reason: "already_stopped" };
+  item.status = { kind: "stopped", ...payload };
+  item.updatedAt = new Date().toISOString();
+  return { ok: true, item };
 }
 
 export type UpdateResult =
