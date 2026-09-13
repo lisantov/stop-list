@@ -13,3 +13,6 @@ export function validateUntil(
   if (ts % STEP_MS !== 0) return "Шаг — 15 минут";
   return null;
 }
+
+export const delay = (ms: number) =>
+  new Promise((resolve) => setTimeout(resolve, ms));

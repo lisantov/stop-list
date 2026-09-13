@@ -9,9 +9,9 @@ export type StopReason =
 export type MenuItemStatusKind = "available" | "stopped";
 
 export type MenuItemStatus =
-  | { kind: MenuItemStatusKind }
+  | { kind: "available" }
   | {
-      kind: MenuItemStatusKind;
+      kind: "stopped";
       reason: StopReason;
       until: string | null; // ISO-время или null = до конца смены
     };

@@ -1,6 +1,7 @@
 import type { NextRequest } from "next/server";
 import { getItems } from "@/server/menu-store";
 import type { Shop } from "@/types/menu";
+import { delay } from "@/shared";
 
 const SHOPS = ["kitchen", "bar", "pastry"] as readonly string[];
 const STATUSES = ["available", "stopped"] as readonly string[];
@@ -27,6 +28,6 @@ export async function GET(request: NextRequest) {
     shop: (shop as Shop) ?? undefined,
     status: (status as "available" | "stopped") ?? undefined,
   });
-
+  await delay(600);
   return Response.json(items);
 }

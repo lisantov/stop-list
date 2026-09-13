@@ -37,8 +37,9 @@ export function useStopItem() {
       return { previous };
     },
 
-    onError: (_e, _v, onMutateResult, context) => {
-      context.client.setQueryData(stopListKeys.all(), onMutateResult?.previous);
+    onError: (_e, _v, ctx) => {
+      if (ctx?.previous)
+        queryClient.setQueryData(stopListKeys.all(), ctx.previous);
     },
 
     onSettled: () => {
@@ -76,8 +77,9 @@ export function useResumeItem() {
       return { previous };
     },
 
-    onError: (_e, _v, onMutateResult, context) => {
-      context.client.setQueryData(stopListKeys.all(), onMutateResult?.previous);
+    onError: (_e, _v, ctx) => {
+      if (ctx?.previous)
+        queryClient.setQueryData(stopListKeys.all(), ctx.previous);
     },
 
     onSettled: () => {
