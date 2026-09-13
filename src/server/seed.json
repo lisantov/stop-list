@@ -1,0 +1,56 @@
+[
+  {
+    "id": "1",
+    "title": "Лазанья",
+    "shop": "kitchen",
+    "stock": 10,
+    "status": {
+      "kind": "available"
+    },
+    "updatedAt": "2026-09-13T08:00:00Z"
+  },
+  {
+    "id": "2",
+    "title": "Пицца Пепперони",
+    "shop": "bar",
+    "stock": 6,
+    "status": {
+      "kind": "available"
+    },
+    "updatedAt": "2026-09-13T10:00:00Z"
+  },
+  {
+    "id": "3",
+    "title": "Паста Болоньезе",
+    "shop": "kitchen",
+    "stock": 0,
+    "status": {
+      "kind": "stopped",
+      "reason": "menu_change",
+      "until": null
+    },
+    "updatedAt": "2026-09-13T11:00:00Z"
+  },
+  {
+    "id": "4",
+    "title": "Сырный крем-суп",
+    "shop": "kitchen",
+    "stock": 4,
+    "status": {
+      "kind": "available"
+    },
+    "updatedAt": "2026-09-13T12:00:00Z"
+  },
+  {
+    "id": "5",
+    "title": "Круассан",
+    "shop": "pastry",
+    "stock": 8,
+    "status": {
+      "kind": "stopped",
+      "reason": "equipment",
+      "until": "2026-09-13T16:00:00Z"
+    },
+    "updatedAt": "2026-09-13T10:00:00Z"
+  }
+]
